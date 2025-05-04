@@ -1,4 +1,3 @@
-
 import { Layout } from "@/components/layout/Layout";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Select,
@@ -26,7 +26,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DollarSign, FileText, Plus, Search } from "lucide-react";
+import { DollarSign, FileText, Plus, Search, Tag, Edit } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 // Mock data for occupied rooms
 const occupiedRooms = [
@@ -129,6 +139,7 @@ const chargeHistory = [
 export default function Charges() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRoom, setSelectedRoom] = useState("");
+  const { toast } = useToast();
   
   // Filter charge history based on search term
   const filteredHistory = chargeHistory.filter(charge => 
@@ -137,6 +148,43 @@ export default function Charges() {
     charge.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
     charge.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleAddCategory = (typeId: string) => {
+    toast({
+      title: "Category added",
+      description: "New category has been added successfully"
+    });
+  };
+
+  const handleEditService = (typeId: string) => {
+    toast({
+      title: "Service edited",
+      description: "Service has been updated successfully"
+    });
+  };
+
+  const handlePostCharge = () => {
+    if (!selectedRoom) {
+      toast({
+        title: "Error",
+        description: "Please select a room before posting a charge",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    toast({
+      title: "Charge posted",
+      description: "The charge has been posted successfully"
+    });
+  };
+  
+  const handleAddService = () => {
+    toast({
+      title: "Service added",
+      description: "New service has been added successfully"
+    });
+  };
   
   return (
     <Layout>
@@ -251,7 +299,7 @@ export default function Charges() {
                 </div>
                 
                 <div className="pt-2">
-                  <Button disabled={!selectedRoom} className="w-full">
+                  <Button onClick={handlePostCharge} disabled={!selectedRoom} className="w-full">
                     <DollarSign className="mr-2 h-4 w-4" />
                     Post Charge
                   </Button>
@@ -309,9 +357,39 @@ export default function Charges() {
                           </span>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm">
-                            <FileText className="h-4 w-4" />
-                          </Button>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                              <DialogHeader>
+                                <DialogTitle>Edit Charge</DialogTitle>
+                                <DialogDescription>
+                                  Update the details for charge {charge.id}
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="space-y-4 py-4">
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium">Description</label>
+                                  <Input defaultValue={charge.description} />
+                                </div>
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium">Amount</label>
+                                  <Input type="number" step="0.01" defaultValue={charge.amount} />
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button type="submit" onClick={() => toast({
+                                  title: "Charge updated",
+                                  description: "The charge has been updated successfully"
+                                })}>
+                                  Save Changes
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -329,10 +407,37 @@ export default function Charges() {
                 <CardTitle>Services & Charges Setup</CardTitle>
                 <CardDescription>Manage service types and charge categories</CardDescription>
               </div>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Service
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Service
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Service</DialogTitle>
+                    <DialogDescription>
+                      Create a new service type for charges
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Service Name</label>
+                      <Input placeholder="Enter service name" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Description</label>
+                      <Input placeholder="Brief description" />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button onClick={handleAddService}>
+                      Add Service
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
@@ -341,8 +446,61 @@ export default function Charges() {
                     <div className="flex justify-between items-center mb-2">
                       <h3 className="text-lg font-semibold">{type.name}</h3>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">Edit</Button>
-                        <Button variant="outline" size="sm">Add Category</Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Edit Service</DialogTitle>
+                              <DialogDescription>
+                                Update service details
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium">Service Name</label>
+                                <Input defaultValue={type.name} />
+                              </div>
+                            </div>
+                            <DialogFooter>
+                              <Button onClick={() => handleEditService(type.id)}>
+                                Save Changes
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                        
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Tag className="mr-2 h-4 w-4" />
+                              Add Category
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Add Category</DialogTitle>
+                              <DialogDescription>
+                                Create a new category for {type.name}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium">Category Name</label>
+                                <Input placeholder="New category name" />
+                              </div>
+                            </div>
+                            <DialogFooter>
+                              <Button onClick={() => handleAddCategory(type.id)}>
+                                Add Category
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
                       </div>
                     </div>
                     

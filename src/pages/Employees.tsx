@@ -4,6 +4,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import {
   Table,
   TableBody,
   TableCell,
@@ -11,245 +19,481 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Filter, Download, User, Users } from "lucide-react";
+import { Search, UserPlus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
-// Mock employees data
+// Sample data for employees
 const employees = [
-  { 
-    id: "EMP001", 
-    name: "John Smith", 
-    position: "Front Desk Manager", 
-    department: "Front Office", 
-    email: "john@example.com", 
-    phone: "123-456-7890",
-    status: "Active",
-    joinDate: "Jan 15, 2024"
+  {
+    id: "E001",
+    name: "Jennifer Anderson",
+    position: "Front Desk Manager",
+    department: "Front Office",
+    email: "jennifer@grandhotel.com",
+    phone: "555-101-1010",
+    startDate: "Jan 15, 2023",
+    status: "Active"
   },
-  { 
-    id: "EMP002", 
-    name: "Emily Johnson", 
-    position: "Housekeeper", 
-    department: "Housekeeping", 
-    email: "emily@example.com", 
-    phone: "234-567-8901",
-    status: "Active",
-    joinDate: "Feb 20, 2024"
+  {
+    id: "E002",
+    name: "Michael Thompson",
+    position: "Concierge",
+    department: "Front Office",
+    email: "michael@grandhotel.com",
+    phone: "555-202-2020",
+    startDate: "Mar 5, 2023",
+    status: "Active"
   },
-  { 
-    id: "EMP003", 
-    name: "Michael Rodriguez", 
-    position: "Maintenance Technician", 
-    department: "Maintenance", 
-    email: "michael@example.com", 
-    phone: "345-678-9012",
-    status: "Active",
-    joinDate: "Mar 5, 2024"
+  {
+    id: "E003",
+    name: "Amanda Rodriguez",
+    position: "Executive Housekeeper",
+    department: "Housekeeping",
+    email: "amanda@grandhotel.com",
+    phone: "555-303-3030",
+    startDate: "Feb 12, 2022",
+    status: "Active"
   },
-  { 
-    id: "EMP004", 
-    name: "Sarah Wilson", 
-    position: "Executive Chef", 
-    department: "Food & Beverage", 
-    email: "sarah@example.com", 
-    phone: "456-789-0123",
-    status: "Active",
-    joinDate: "Dec 10, 2023"
+  {
+    id: "E004",
+    name: "David Park",
+    position: "Maintenance Supervisor",
+    department: "Maintenance",
+    email: "david@grandhotel.com",
+    phone: "555-404-4040",
+    startDate: "Jul 20, 2023",
+    status: "Active"
   },
-  { 
-    id: "EMP005", 
-    name: "David Thompson", 
-    position: "Security Officer", 
-    department: "Security", 
-    email: "david@example.com", 
-    phone: "567-890-1234",
-    status: "On Leave",
-    joinDate: "Apr 18, 2024"
+  {
+    id: "E005",
+    name: "Sarah Williams",
+    position: "Restaurant Manager",
+    department: "Food & Beverage",
+    email: "sarah@grandhotel.com",
+    phone: "555-505-5050",
+    startDate: "Apr 10, 2022",
+    status: "On Leave"
   },
-  { 
-    id: "EMP006", 
-    name: "Jennifer Garcia", 
-    position: "Human Resources Manager", 
-    department: "Human Resources", 
-    email: "jennifer@example.com", 
-    phone: "678-901-2345",
-    status: "Active",
-    joinDate: "Feb 1, 2024"
+  {
+    id: "E006",
+    name: "James Peterson",
+    position: "Night Auditor",
+    department: "Accounting",
+    email: "james@grandhotel.com",
+    phone: "555-606-6060",
+    startDate: "Sep 15, 2023",
+    status: "Active"
   }
 ];
 
-// Mock departments data
-const departments = [
-  { name: "Front Office", employeeCount: 8 },
-  { name: "Housekeeping", employeeCount: 12 },
-  { name: "Food & Beverage", employeeCount: 15 },
-  { name: "Maintenance", employeeCount: 6 },
-  { name: "Security", employeeCount: 4 },
-  { name: "Human Resources", employeeCount: 3 }
+// Sample schedules
+const schedules = [
+  {
+    id: "S001",
+    employeeId: "E001",
+    employeeName: "Jennifer Anderson",
+    position: "Front Desk Manager",
+    monday: "9AM-5PM",
+    tuesday: "9AM-5PM",
+    wednesday: "9AM-5PM",
+    thursday: "9AM-5PM",
+    friday: "9AM-5PM",
+    saturday: "OFF",
+    sunday: "OFF"
+  },
+  {
+    id: "S002",
+    employeeId: "E002",
+    employeeName: "Michael Thompson",
+    position: "Concierge",
+    monday: "10AM-6PM",
+    tuesday: "10AM-6PM",
+    wednesday: "OFF",
+    thursday: "10AM-6PM",
+    friday: "10AM-6PM",
+    saturday: "12PM-8PM",
+    sunday: "OFF"
+  },
+  {
+    id: "S003",
+    employeeId: "E003",
+    employeeName: "Amanda Rodriguez",
+    position: "Executive Housekeeper",
+    monday: "7AM-3PM",
+    tuesday: "7AM-3PM",
+    wednesday: "7AM-3PM",
+    thursday: "OFF",
+    friday: "7AM-3PM",
+    saturday: "7AM-3PM",
+    sunday: "OFF"
+  },
+  {
+    id: "S004",
+    employeeId: "E004",
+    employeeName: "David Park",
+    position: "Maintenance Supervisor",
+    monday: "8AM-4PM",
+    tuesday: "8AM-4PM",
+    wednesday: "8AM-4PM",
+    thursday: "8AM-4PM",
+    friday: "8AM-4PM",
+    saturday: "OFF",
+    sunday: "OFF"
+  },
+  {
+    id: "S005",
+    employeeId: "E005",
+    employeeName: "Sarah Williams",
+    position: "Restaurant Manager",
+    monday: "ON LEAVE",
+    tuesday: "ON LEAVE",
+    wednesday: "ON LEAVE",
+    thursday: "ON LEAVE",
+    friday: "ON LEAVE",
+    saturday: "ON LEAVE",
+    sunday: "ON LEAVE"
+  },
+  {
+    id: "S006",
+    employeeId: "E006",
+    employeeName: "James Peterson",
+    position: "Night Auditor",
+    monday: "11PM-7AM",
+    tuesday: "11PM-7AM",
+    wednesday: "11PM-7AM",
+    thursday: "OFF",
+    friday: "OFF",
+    saturday: "11PM-7AM",
+    sunday: "11PM-7AM"
+  }
 ];
 
 export default function Employees() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("employees");
+  const { toast } = useToast();
   
-  // Filter employees based on search
-  const filteredEmployees = employees.filter(employee => 
+  // Filter employees based on search term
+  const filteredEmployees = employees.filter(employee =>
     employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
+  // Filter schedules based on search term
+  const filteredSchedules = schedules.filter(schedule =>
+    schedule.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    schedule.position.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleAddEmployee = () => {
+    toast({
+      title: "Employee Added",
+      description: "New employee has been added successfully."
+    });
+  };
+
+  const handleEditEmployee = (employeeId: string) => {
+    toast({
+      title: "Employee Updated",
+      description: `Employee ${employeeId} has been updated successfully.`
+    });
+  };
+  
   return (
     <Layout>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Staff Management</h1>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Employee
-        </Button>
+        <h1 className="text-3xl font-bold">Employees</h1>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Add Employee
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Add New Employee</DialogTitle>
+              <DialogDescription>
+                Enter details for the new employee
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="name" className="text-right text-sm font-medium">
+                  Full Name
+                </label>
+                <Input id="name" className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="position" className="text-right text-sm font-medium">
+                  Position
+                </label>
+                <Input id="position" className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="department" className="text-right text-sm font-medium">
+                  Department
+                </label>
+                <Select>
+                  <SelectTrigger id="department" className="col-span-3">
+                    <SelectValue placeholder="Select department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="front-office">Front Office</SelectItem>
+                    <SelectItem value="housekeeping">Housekeeping</SelectItem>
+                    <SelectItem value="maintenance">Maintenance</SelectItem>
+                    <SelectItem value="food-beverage">Food & Beverage</SelectItem>
+                    <SelectItem value="accounting">Accounting</SelectItem>
+                    <SelectItem value="hr">Human Resources</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="email" className="text-right text-sm font-medium">
+                  Email
+                </label>
+                <Input id="email" type="email" className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="phone" className="text-right text-sm font-medium">
+                  Phone
+                </label>
+                <Input id="phone" className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="startDate" className="text-right text-sm font-medium">
+                  Start Date
+                </label>
+                <Input id="startDate" type="date" className="col-span-3" />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={handleAddEmployee}>Add Employee</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card>
-          <CardContent className="p-4 flex items-center">
-            <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4">
-              <Users size={24} />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Total Staff</p>
-              <p className="text-2xl font-semibold">48</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 flex items-center">
-            <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-4">
-              <User size={24} />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Active Staff</p>
-              <p className="text-2xl font-semibold">45</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 flex items-center">
-            <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">On Leave</p>
-              <p className="text-2xl font-semibold">3</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <Tabs defaultValue="employees" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-4">
-          <TabsTrigger value="employees">Employees</TabsTrigger>
-          <TabsTrigger value="departments">Departments</TabsTrigger>
-          <TabsTrigger value="schedules">Schedules</TabsTrigger>
+          <TabsTrigger value="employees">Employee Directory</TabsTrigger>
+          <TabsTrigger value="schedule">Employee Schedule</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="employees" className="mt-0">
+        <TabsContent value="employees">
           <Card>
-            <CardHeader className="pb-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <CardTitle className="text-lg">Employee List</CardTitle>
-              <div className="flex gap-2 w-full sm:w-auto">
-                <div className="relative flex-grow sm:flex-grow-0">
-                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="Search employees..."
-                    className="pl-10 w-full md:w-80"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <Button variant="outline" size="icon">
-                  <Filter className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon">
-                  <Download className="h-4 w-4" />
-                </Button>
+            <CardHeader>
+              <CardTitle>Employee Directory</CardTitle>
+              <CardDescription>Manage hotel staff information</CardDescription>
+              <div className="mt-4 relative">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search employees by name, position, or department..."
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
             </CardHeader>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Position</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Join Date</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredEmployees.map((employee) => (
-                    <TableRow key={employee.id}>
-                      <TableCell className="font-medium">{employee.id}</TableCell>
-                      <TableCell>{employee.name}</TableCell>
-                      <TableCell>{employee.position}</TableCell>
-                      <TableCell>{employee.department}</TableCell>
-                      <TableCell>
-                        <div>{employee.email}</div>
-                        <div className="text-muted-foreground text-xs">{employee.phone}</div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={employee.status === "Active" ? "bg-green-500" : "bg-orange-500"}>
-                          {employee.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{employee.joinDate}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">View</Button>
-                      </TableCell>
+            <CardContent>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Position</TableHead>
+                      <TableHead>Department</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Phone</TableHead>
+                      <TableHead>Start Date</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="departments" className="mt-0">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Departments</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {departments.map((department) => (
-                  <Card key={department.name}>
-                    <CardContent className="p-4 flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">{department.name}</h3>
-                        <p className="text-sm text-muted-foreground">{department.employeeCount} Employees</p>
-                      </div>
-                      <Button variant="ghost" size="icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
+                  </TableHeader>
+                  <TableBody>
+                    {filteredEmployees.map((employee) => (
+                      <TableRow key={employee.id}>
+                        <TableCell>{employee.id}</TableCell>
+                        <TableCell className="font-medium">{employee.name}</TableCell>
+                        <TableCell>{employee.position}</TableCell>
+                        <TableCell>{employee.department}</TableCell>
+                        <TableCell>{employee.email}</TableCell>
+                        <TableCell>{employee.phone}</TableCell>
+                        <TableCell>{employee.startDate}</TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            employee.status === "Active" 
+                              ? "bg-green-100 text-green-800" 
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}>
+                            {employee.status}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button size="sm" variant="outline">Edit</Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[600px]">
+                              <DialogHeader>
+                                <DialogTitle>Edit Employee</DialogTitle>
+                                <DialogDescription>
+                                  Update employee information
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <label className="text-right text-sm font-medium">
+                                    Full Name
+                                  </label>
+                                  <Input defaultValue={employee.name} className="col-span-3" />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <label className="text-right text-sm font-medium">
+                                    Position
+                                  </label>
+                                  <Input defaultValue={employee.position} className="col-span-3" />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <label className="text-right text-sm font-medium">
+                                    Department
+                                  </label>
+                                  <Select>
+                                    <SelectTrigger className="col-span-3">
+                                      <SelectValue placeholder={employee.department} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="front-office">Front Office</SelectItem>
+                                      <SelectItem value="housekeeping">Housekeeping</SelectItem>
+                                      <SelectItem value="maintenance">Maintenance</SelectItem>
+                                      <SelectItem value="food-beverage">Food & Beverage</SelectItem>
+                                      <SelectItem value="accounting">Accounting</SelectItem>
+                                      <SelectItem value="hr">Human Resources</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <label className="text-right text-sm font-medium">
+                                    Email
+                                  </label>
+                                  <Input defaultValue={employee.email} type="email" className="col-span-3" />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <label className="text-right text-sm font-medium">
+                                    Phone
+                                  </label>
+                                  <Input defaultValue={employee.phone} className="col-span-3" />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <label className="text-right text-sm font-medium">
+                                    Status
+                                  </label>
+                                  <Select>
+                                    <SelectTrigger className="col-span-3">
+                                      <SelectValue placeholder={employee.status} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="active">Active</SelectItem>
+                                      <SelectItem value="on-leave">On Leave</SelectItem>
+                                      <SelectItem value="terminated">Terminated</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button onClick={() => handleEditEmployee(employee.id)}>
+                                  Save Changes
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="schedules" className="mt-0">
+        <TabsContent value="schedule">
           <Card>
-            <CardContent className="p-6 text-center">
-              <p className="text-muted-foreground">Employee schedules and shift management will be available here</p>
-              <Button className="mt-4">Setup Schedules</Button>
+            <CardHeader>
+              <CardTitle>Employee Schedule</CardTitle>
+              <CardDescription>View weekly work schedules</CardDescription>
+              <div className="mt-4 relative">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search schedule by employee name or position..."
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="whitespace-nowrap">Employee</TableHead>
+                      <TableHead className="whitespace-nowrap">Position</TableHead>
+                      <TableHead className="whitespace-nowrap">Monday</TableHead>
+                      <TableHead className="whitespace-nowrap">Tuesday</TableHead>
+                      <TableHead className="whitespace-nowrap">Wednesday</TableHead>
+                      <TableHead className="whitespace-nowrap">Thursday</TableHead>
+                      <TableHead className="whitespace-nowrap">Friday</TableHead>
+                      <TableHead className="whitespace-nowrap">Saturday</TableHead>
+                      <TableHead className="whitespace-nowrap">Sunday</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredSchedules.map((schedule) => (
+                      <TableRow key={schedule.id}>
+                        <TableCell className="font-medium whitespace-nowrap">{schedule.employeeName}</TableCell>
+                        <TableCell className="whitespace-nowrap">{schedule.position}</TableCell>
+                        <TableCell className="whitespace-nowrap">{schedule.monday}</TableCell>
+                        <TableCell className="whitespace-nowrap">{schedule.tuesday}</TableCell>
+                        <TableCell className="whitespace-nowrap">{schedule.wednesday}</TableCell>
+                        <TableCell className="whitespace-nowrap">{schedule.thursday}</TableCell>
+                        <TableCell className="whitespace-nowrap">{schedule.friday}</TableCell>
+                        <TableCell className="whitespace-nowrap">{schedule.saturday}</TableCell>
+                        <TableCell className="whitespace-nowrap">{schedule.sunday}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
+            <CardFooter>
+              <Button className="ml-auto" variant="outline" onClick={() => toast({
+                title: "Schedule Updated",
+                description: "Weekly schedule has been updated"
+              })}>
+                Edit Schedule
+              </Button>
+            </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>
