@@ -1,4 +1,3 @@
-
 import { Layout } from "@/components/layout/Layout";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,8 @@ import { format } from "date-fns";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { CalendarIcon, Download, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DateRange } from "react-day-picker";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Mock data for occupancy report
 const occupancyData = [
@@ -59,10 +60,7 @@ const roomTypeData = [
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 export default function Reports() {
-  const [dateRange, setDateRange] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
+  const [dateRange, setDateRange] = useState<DateRange>({
     from: new Date(2025, 4, 1), // May 1, 2025
     to: new Date(2025, 4, 7),   // May 7, 2025
   });

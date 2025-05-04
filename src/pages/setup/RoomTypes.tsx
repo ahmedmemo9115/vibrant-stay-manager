@@ -112,6 +112,7 @@ export default function RoomTypes() {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [editMode, setEditMode] = useState(false);
   const [currentRoomType, setCurrentRoomType] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("roomTypesList");
   
   const toggleAmenity = (amenity: string) => {
     if (selectedAmenities.includes(amenity)) {
@@ -125,6 +126,7 @@ export default function RoomTypes() {
     setCurrentRoomType(roomType);
     setSelectedAmenities(roomType.amenities);
     setEditMode(true);
+    setActiveTab("addRoomType");
   };
   
   const handleCancelEdit = () => {
@@ -145,7 +147,7 @@ export default function RoomTypes() {
         <h1 className="text-3xl font-bold">Room Types Setup</h1>
       </div>
       
-      <Tabs defaultValue="roomTypesList" className="w-full">
+      <Tabs defaultValue="roomTypesList" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="roomTypesList">Room Types List</TabsTrigger>
           <TabsTrigger value="addRoomType">Add Room Type</TabsTrigger>
