@@ -1,9 +1,9 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "./StatusBadge";
 import { User, CalendarDays, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 type RoomStatus = "vacant" | "occupied" | "reserved" | "maintenance" | "cleaning" | "checkout";
 
@@ -26,8 +26,35 @@ export function RoomCard({
   checkOut,
   className
 }: RoomCardProps) {
+  const navigate = useNavigate();
   const isOccupied = status === "occupied";
   const isReserved = status === "reserved";
+  
+  const handleCheckIn = () => {
+    navigate(`/checkin?room=${roomNumber}`);
+  };
+  
+  const handleCheckOut = () => {
+    navigate(`/checkout?room=${roomNumber}`);
+  };
+  
+  const handleViewDetails = () => {
+    if (isOccupied || isReserved) {
+      navigate(`/reservations?room=${roomNumber}`);
+    } else {
+      navigate(`/rooms?room=${roomNumber}`);
+    }
+  };
+  
+  const handleMarkReady = () => {
+    // For maintenance or cleaning, navigate to maintenance details
+    navigate(`/maintenance?room=${roomNumber}`);
+  };
+  
+  const handleMarkClean = () => {
+    // For checkout, navigate to housekeeping
+    navigate(`/housekeeping?room=${roomNumber}`);
+  };
   
   return (
     <Card className={cn("overflow-hidden border-l-4", {
@@ -73,38 +100,38 @@ export function RoomCard({
         <div className="grid grid-cols-2 gap-2 mt-3">
           {status === "vacant" && (
             <>
-              <Button size="sm" variant="default">Check In</Button>
-              <Button size="sm" variant="outline">Details</Button>
+              <Button size="sm" variant="default" onClick={handleCheckIn}>Check In</Button>
+              <Button size="sm" variant="outline" onClick={handleViewDetails}>Details</Button>
             </>
           )}
           {status === "occupied" && (
             <>
-              <Button size="sm" variant="default">Check Out</Button>
-              <Button size="sm" variant="outline">Details</Button>
+              <Button size="sm" variant="default" onClick={handleCheckOut}>Check Out</Button>
+              <Button size="sm" variant="outline" onClick={handleViewDetails}>Details</Button>
             </>
           )}
           {status === "reserved" && (
             <>
-              <Button size="sm" variant="default">Check In</Button>
-              <Button size="sm" variant="outline">Details</Button>
+              <Button size="sm" variant="default" onClick={handleCheckIn}>Check In</Button>
+              <Button size="sm" variant="outline" onClick={handleViewDetails}>Details</Button>
             </>
           )}
           {status === "cleaning" && (
             <>
-              <Button size="sm" variant="default">Mark Ready</Button>
-              <Button size="sm" variant="outline">Details</Button>
+              <Button size="sm" variant="default" onClick={handleMarkReady}>Mark Ready</Button>
+              <Button size="sm" variant="outline" onClick={handleViewDetails}>Details</Button>
             </>
           )}
           {status === "maintenance" && (
             <>
-              <Button size="sm" variant="default">Mark Ready</Button>
-              <Button size="sm" variant="outline">Details</Button>
+              <Button size="sm" variant="default" onClick={handleMarkReady}>Mark Ready</Button>
+              <Button size="sm" variant="outline" onClick={handleViewDetails}>Details</Button>
             </>
           )}
           {status === "checkout" && (
             <>
-              <Button size="sm" variant="default">Mark Clean</Button>
-              <Button size="sm" variant="outline">Details</Button>
+              <Button size="sm" variant="default" onClick={handleMarkClean}>Mark Clean</Button>
+              <Button size="sm" variant="outline" onClick={handleViewDetails}>Details</Button>
             </>
           )}
         </div>
