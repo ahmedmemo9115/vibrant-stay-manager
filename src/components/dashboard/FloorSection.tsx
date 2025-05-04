@@ -17,12 +17,14 @@ interface Room {
 interface FloorSectionProps {
   floorNumber: string;
   rooms: Room[];
+  onRoomClick: (roomNumber: string) => void;
 }
 
-export function FloorSection({ floorNumber, rooms }: FloorSectionProps) {
+export function FloorSection({ floorNumber, rooms, onRoomClick }: FloorSectionProps) {
   const { toast } = useToast();
 
   const handleViewRoom = (roomNumber: string) => {
+    onRoomClick(roomNumber);
     toast({
       title: "Room Details",
       description: `Viewing details for room ${roomNumber}`
