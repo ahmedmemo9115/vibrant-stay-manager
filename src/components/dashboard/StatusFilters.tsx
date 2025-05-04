@@ -71,12 +71,12 @@ export function StatusFilters({ onFilterChange }: StatusFiltersProps) {
             </SelectContent>
           </Select>
           
-          <Select defaultValue="all">
+          <Select defaultValue="all-types">
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter by type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="all-types">All Types</SelectItem>
               <SelectItem value="standard">Standard</SelectItem>
               <SelectItem value="deluxe">Deluxe</SelectItem>
               <SelectItem value="suite">Suite</SelectItem>

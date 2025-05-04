@@ -24,6 +24,13 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Pencil, Trash, ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Mock room types data
 const roomTypes = [
@@ -108,6 +115,15 @@ const allAmenities = [
   "Safe"
 ];
 
+// Bed type options
+const bedTypes = [
+  { value: "single", label: "Single" },
+  { value: "double", label: "Double" },
+  { value: "queen", label: "Queen" },
+  { value: "king", label: "King" },
+  { value: "twin", label: "Twin" }
+];
+
 export default function RoomTypes() {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [editMode, setEditMode] = useState(false);
@@ -133,6 +149,11 @@ export default function RoomTypes() {
     setCurrentRoomType(null);
     setSelectedAmenities([]);
     setEditMode(false);
+    setActiveTab("roomTypesList");
+  };
+  
+  const handleAddNewClick = () => {
+    setActiveTab("addRoomType");
   };
   
   return (
@@ -162,7 +183,7 @@ export default function RoomTypes() {
                   Manage your hotel's room types and their configurations
                 </CardDescription>
               </div>
-              <Button onClick={() => document.querySelector('[data-value="addRoomType"]')?.click()}>
+              <Button onClick={handleAddNewClick}>
                 <Plus className="mr-2 h-4 w-4" />
                 Add Room Type
               </Button>
@@ -274,11 +295,16 @@ export default function RoomTypes() {
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="bedType" className="text-sm font-medium">Bed Type</label>
-                  <Input 
-                    id="bedType" 
-                    placeholder="e.g. King, Queen, Twin" 
-                    defaultValue={editMode ? currentRoomType?.bedType : ''}
-                  />
+                  <Select defaultValue={editMode ? currentRoomType?.bedType.toLowerCase() : "single"}>
+                    <SelectTrigger id="bedType">
+                      <SelectValue placeholder="Select bed type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {bedTypes.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               
