@@ -1,3 +1,4 @@
+
 import { Layout } from "@/components/layout/Layout";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,9 @@ import { CalendarIcon, Download, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { toast } from "sonner";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 // Mock data for occupancy report
 const occupancyData = [
@@ -64,6 +68,265 @@ export default function Reports() {
     from: new Date(2025, 4, 1), // May 1, 2025
     to: new Date(2025, 4, 7),   // May 7, 2025
   });
+  
+  const [reportName, setReportName] = useState("");
+  const [reportCategory, setReportCategory] = useState("");
+  const [reportFormat, setReportFormat] = useState("");
+  const [selectedFields, setSelectedFields] = useState<string[]>([]);
+  const [showPreview, setShowPreview] = useState(false);
+  const [activeReport, setActiveReport] = useState<{
+    name: string;
+    category: string;
+    format: string;
+    data: any[];
+  } | null>(null);
+  
+  const handleFieldToggle = (field: string) => {
+    setSelectedFields(prev => 
+      prev.includes(field) 
+        ? prev.filter(f => f !== field)
+        : [...prev, field]
+    );
+  };
+  
+  const handlePreviewReport = () => {
+    if (!reportName || !reportCategory || !reportFormat || selectedFields.length === 0) {
+      toast.error("Please fill all required fields and select at least one data field");
+      return;
+    }
+    
+    let previewData;
+    
+    switch (reportCategory) {
+      case "occupancy":
+        previewData = occupancyData;
+        break;
+      case "revenue":
+        previewData = revenueData;
+        break;
+      case "guests":
+        previewData = [
+          { date: '05/01', businessGuests: 45, leisureGuests: 35, groupGuests: 15, others: 5 },
+          { date: '05/02', businessGuests: 50, leisureGuests: 30, groupGuests: 10, others: 10 },
+          { date: '05/03', businessGuests: 40, leisureGuests: 45, groupGuests: 10, others: 5 },
+          { date: '05/04', businessGuests: 35, leisureGuests: 50, groupGuests: 10, others: 5 },
+        ];
+        break;
+      case "operations":
+        previewData = [
+          { date: '05/01', maintenanceIssues: 5, cleaningTasks: 25, guestRequests: 15 },
+          { date: '05/02', maintenanceIssues: 3, cleaningTasks: 28, guestRequests: 12 },
+          { date: '05/03', maintenanceIssues: 7, cleaningTasks: 22, guestRequests: 18 },
+          { date: '05/04', maintenanceIssues: 4, cleaningTasks: 26, guestRequests: 10 },
+        ];
+        break;
+      default:
+        previewData = [];
+    }
+    
+    setActiveReport({
+      name: reportName,
+      category: reportCategory,
+      format: reportFormat,
+      data: previewData
+    });
+    
+    setShowPreview(true);
+    toast.success("Report preview generated");
+  };
+  
+  const handleSaveReport = () => {
+    if (!reportName || !reportCategory || !reportFormat || selectedFields.length === 0) {
+      toast.error("Please fill all required fields and select at least one data field");
+      return;
+    }
+    
+    toast.success(`Report "${reportName}" saved successfully`);
+  };
+  
+  const handleRunSavedReport = (report: { name: string; category: string; lastRun: string }) => {
+    let reportData;
+    
+    switch (report.category) {
+      case "Revenue":
+        reportData = revenueData;
+        break;
+      case "Occupancy":
+        reportData = occupancyData;
+        break;
+      case "Guest Analytics":
+        reportData = [
+          { date: '05/01', businessGuests: 45, leisureGuests: 35, groupGuests: 15, others: 5 },
+          { date: '05/02', businessGuests: 50, leisureGuests: 30, groupGuests: 10, others: 10 },
+          { date: '05/03', businessGuests: 40, leisureGuests: 45, groupGuests: 10, others: 5 },
+          { date: '05/04', businessGuests: 35, leisureGuests: 50, groupGuests: 10, others: 5 },
+        ];
+        break;
+      default:
+        reportData = [];
+    }
+    
+    setActiveReport({
+      name: report.name,
+      category: report.category,
+      format: "table", // Default to table for saved reports
+      data: reportData
+    });
+    
+    setShowPreview(true);
+    toast.success(`Report "${report.name}" generated`);
+  };
+  
+  const renderReportPreview = () => {
+    if (!activeReport) return null;
+    
+    const { format, data, name } = activeReport;
+    
+    switch (format) {
+      case "table":
+        return (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>{name}</CardTitle>
+              <CardDescription>Generated on {format(new Date(), "PPP")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    {Object.keys(data[0] || {}).map((key) => (
+                      <TableHead key={key}>{key}</TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.map((row, rowIndex) => (
+                    <TableRow key={rowIndex}>
+                      {Object.values(row).map((value, valueIndex) => (
+                        <TableCell key={valueIndex}>{value}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        );
+      
+      case "bar":
+        return (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>{name}</CardTitle>
+              <CardDescription>Generated on {format(new Date(), "PPP")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={data}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    {Object.keys(data[0] || {})
+                      .filter(key => key !== "date")
+                      .map((key, index) => (
+                        <Bar 
+                          key={key}
+                          dataKey={key} 
+                          fill={COLORS[index % COLORS.length]} 
+                          name={key}
+                        />
+                      ))}
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        );
+        
+      case "line":
+        return (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>{name}</CardTitle>
+              <CardDescription>Generated on {format(new Date(), "PPP")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={data}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    {Object.keys(data[0] || {})
+                      .filter(key => key !== "date")
+                      .map((key, index) => (
+                        <Line 
+                          key={key}
+                          type="monotone" 
+                          dataKey={key} 
+                          stroke={COLORS[index % COLORS.length]} 
+                          name={key}
+                        />
+                      ))}
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        );
+        
+      case "pie":
+        return (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>{name}</CardTitle>
+              <CardDescription>Generated on {format(new Date(), "PPP")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={data.map((item: any) => ({
+                        name: item.name || item.date,
+                        value: Object.values(item)[1] as number
+                      }))}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                      label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {data.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        );
+        
+      default:
+        return (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>{name}</CardTitle>
+              <CardDescription>Unable to render this report format</CardDescription>
+            </CardHeader>
+          </Card>
+        );
+    }
+  };
   
   return (
     <Layout>
@@ -462,11 +725,16 @@ export default function Reports() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label htmlFor="reportName" className="text-sm font-medium">Report Name</label>
-                  <Input id="reportName" placeholder="Enter report name" />
+                  <Input 
+                    id="reportName" 
+                    placeholder="Enter report name" 
+                    value={reportName}
+                    onChange={(e) => setReportName(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="reportCategory" className="text-sm font-medium">Category</label>
-                  <Select>
+                  <Select value={reportCategory} onValueChange={setReportCategory}>
                     <SelectTrigger id="reportCategory">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
@@ -480,7 +748,7 @@ export default function Reports() {
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="reportFormat" className="text-sm font-medium">Format</label>
-                  <Select>
+                  <Select value={reportFormat} onValueChange={setReportFormat}>
                     <SelectTrigger id="reportFormat">
                       <SelectValue placeholder="Select format" />
                     </SelectTrigger>
@@ -504,7 +772,11 @@ export default function Reports() {
                     "Source", "Guest Type", "Length of Stay", "Nationality"
                   ].map((field) => (
                     <div key={field} className="flex items-center space-x-2">
-                      <Checkbox id={`field-${field}`} />
+                      <Checkbox 
+                        id={`field-${field}`}
+                        checked={selectedFields.includes(field)}
+                        onCheckedChange={() => handleFieldToggle(field)}
+                      />
                       <label
                         htmlFor={`field-${field}`}
                         className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -517,12 +789,20 @@ export default function Reports() {
               </div>
               
               <div className="flex flex-col md:flex-row gap-4">
-                <Button className="w-full md:w-auto">Preview Report</Button>
-                <Button className="w-full md:w-auto" variant="outline">Save Report</Button>
-                <Button className="w-full md:w-auto" variant="outline">Schedule Automated Report</Button>
+                <Button className="w-full md:w-auto" onClick={handlePreviewReport}>Preview Report</Button>
+                <Button className="w-full md:w-auto" variant="outline" onClick={handleSaveReport}>Save Report</Button>
+                <Button 
+                  className="w-full md:w-auto" 
+                  variant="outline" 
+                  onClick={() => toast.success("Report scheduled for daily delivery")}
+                >
+                  Schedule Automated Report
+                </Button>
               </div>
             </CardContent>
           </Card>
+          
+          {showPreview && renderReportPreview()}
           
           <div className="mt-6">
             <h3 className="text-lg font-semibold mb-4">Saved Reports</h3>
@@ -538,8 +818,22 @@ export default function Reports() {
                     <p className="text-sm text-muted-foreground">Category: {report.category}</p>
                     <p className="text-sm text-muted-foreground">Last Run: {report.lastRun}</p>
                     <div className="mt-4 flex gap-2">
-                      <Button size="sm" variant="outline" className="w-full">Run</Button>
-                      <Button size="sm" variant="outline" className="w-full">Edit</Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => handleRunSavedReport(report)}
+                      >
+                        Run
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => toast.success(`Editing report: ${report.name}`)}
+                      >
+                        Edit
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
