@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // Mock rooms data
 const mockRooms = [
@@ -66,6 +67,7 @@ export default function Rooms() {
     floor: "1"
   });
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleAddRoom = () => {
     if (!newRoom.roomNumber || !newRoom.type || !newRoom.floor) {
@@ -88,6 +90,11 @@ export default function Rooms() {
       type: "standard-single",
       floor: "1"
     });
+  };
+  
+  const handleRoomDetailClick = (roomNumber: string) => {
+    // Navigate to room details page with the room number as a parameter
+    navigate(`/rooms?room=${roomNumber}`);
   };
 
   return (
@@ -272,7 +279,8 @@ export default function Rooms() {
                   room.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
                   (room.guest && room.guest.toLowerCase().includes(searchTerm.toLowerCase()))
                 )
-              )} 
+              )}
+              onRoomClick={handleRoomDetailClick}
             />
           ))}
         </TabsContent>
@@ -288,7 +296,8 @@ export default function Rooms() {
                   room.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
                   (room.guest && room.guest.toLowerCase().includes(searchTerm.toLowerCase()))
                 )
-              )} 
+              )}
+              onRoomClick={handleRoomDetailClick}
             />
           </TabsContent>
         ))}
