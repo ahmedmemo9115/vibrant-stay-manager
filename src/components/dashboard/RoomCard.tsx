@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { FileText, LogIn, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { toast as sonnerToast } from "@/components/ui/sonner";
 
 interface RoomCardProps {
   roomNumber: string;
@@ -28,17 +29,21 @@ export function RoomCard({
   
   const handleCheckIn = (e: React.MouseEvent) => {
     e.stopPropagation();
-    toast({
-      title: "Check-in initiated",
-      description: `Starting check-in process for Room ${roomNumber}`
+    // Use sonner toast for more visible right-side popups
+    sonnerToast.success(`Starting check-in process for Room ${roomNumber}`, {
+      description: `Room ${roomNumber} - ${roomType}`,
+      position: "top-right",
+      duration: 5000
     });
   };
   
   const handleMakeReady = (e: React.MouseEvent) => {
     e.stopPropagation();
-    toast({
-      title: "Room status updated",
-      description: `Room ${roomNumber} marked as ready`
+    // Use sonner toast for more visible right-side popups
+    sonnerToast.success(`Room ${roomNumber} marked as ready`, {
+      description: `Status updated from ${status} to vacant`,
+      position: "top-right",
+      duration: 5000
     });
   };
   
@@ -132,3 +137,4 @@ function getStatusColor(status: string) {
       return "#cbd5e1"; // slate
   }
 }
+
