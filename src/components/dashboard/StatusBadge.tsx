@@ -1,6 +1,6 @@
 
 import { cn } from "@/lib/utils";
-import { Bed, Tool, Trash, Calendar, Clock, CheckCheck } from "lucide-react";
+import { Bed, Wrench, Trash, Calendar, Clock, CheckCheck } from "lucide-react";
 
 type RoomStatus = "vacant" | "occupied" | "reserved" | "maintenance" | "cleaning" | "checkout";
 
@@ -19,7 +19,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
       case "reserved":
         return <Calendar size={14} />;
       case "maintenance":
-        return <Tool size={14} />;
+        return <Wrench size={14} />;
       case "cleaning":
         return <Trash size={14} />;
       case "checkout":
