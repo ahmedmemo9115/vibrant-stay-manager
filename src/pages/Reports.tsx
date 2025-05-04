@@ -180,9 +180,9 @@ export default function Reports() {
   const renderReportPreview = () => {
     if (!activeReport) return null;
     
-    const { format, data, name } = activeReport;
+    const { format: reportFormat, data, name } = activeReport;
     
-    switch (format) {
+    switch (reportFormat) {
       case "table":
         return (
           <Card className="mt-6">
@@ -203,7 +203,7 @@ export default function Reports() {
                   {data.map((row, rowIndex) => (
                     <TableRow key={rowIndex}>
                       {Object.values(row).map((value, valueIndex) => (
-                        <TableCell key={valueIndex}>{value}</TableCell>
+                        <TableCell key={valueIndex}>{value as React.ReactNode}</TableCell>
                       ))}
                     </TableRow>
                   ))}
