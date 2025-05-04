@@ -14,6 +14,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
 import { FloorSection } from "@/components/dashboard/FloorSection";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 import { Plus, Search } from "lucide-react";
 
 // Mock rooms data
@@ -55,15 +59,114 @@ export default function Rooms() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentView, setCurrentView] = useState("grid");
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [roomDialog, setRoomDialog] = useState(false);
+  const [newRoom, setNewRoom] = useState({
+    roomNumber: "",
+    type: "standard-single",
+    floor: "1"
+  });
+  const { toast } = useToast();
+
+  const handleAddRoom = () => {
+    if (!newRoom.roomNumber || !newRoom.type || !newRoom.floor) {
+      toast({
+        variant: "destructive",
+        title: "Missing information",
+        description: "Please fill in all required fields"
+      });
+      return;
+    }
+
+    toast({
+      title: "Room added",
+      description: `Room ${newRoom.roomNumber} has been added successfully.`
+    });
+    
+    setRoomDialog(false);
+    setNewRoom({
+      roomNumber: "",
+      type: "standard-single",
+      floor: "1"
+    });
+  };
 
   return (
     <Layout>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Room Management</h1>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Room
-        </Button>
+        <Dialog open={roomDialog} onOpenChange={setRoomDialog}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Room
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Room</DialogTitle>
+              <DialogDescription>
+                Enter the details for the new room.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="roomNumber" className="text-right">
+                  Room Number
+                </Label>
+                <Input
+                  id="roomNumber"
+                  className="col-span-3"
+                  value={newRoom.roomNumber}
+                  onChange={(e) => setNewRoom({...newRoom, roomNumber: e.target.value})}
+                  placeholder="101"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="type" className="text-right">
+                  Room Type
+                </Label>
+                <Select
+                  value={newRoom.type}
+                  onValueChange={(value) => setNewRoom({...newRoom, type: value})}
+                >
+                  <SelectTrigger className="col-span-3" id="type">
+                    <SelectValue placeholder="Select room type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="standard-single">Standard Single</SelectItem>
+                    <SelectItem value="standard-double">Standard Double</SelectItem>
+                    <SelectItem value="standard-twin">Standard Twin</SelectItem>
+                    <SelectItem value="deluxe-double">Deluxe Double</SelectItem>
+                    <SelectItem value="junior-suite">Junior Suite</SelectItem>
+                    <SelectItem value="executive-suite">Executive Suite</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="floor" className="text-right">
+                  Floor
+                </Label>
+                <Select
+                  value={newRoom.floor}
+                  onValueChange={(value) => setNewRoom({...newRoom, floor: value})}
+                >
+                  <SelectTrigger className="col-span-3" id="floor">
+                    <SelectValue placeholder="Select floor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Floor 1</SelectItem>
+                    <SelectItem value="2">Floor 2</SelectItem>
+                    <SelectItem value="3">Floor 3</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setRoomDialog(false)}>Cancel</Button>
+              <Button onClick={handleAddRoom}>Add Room</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
       
       <div className="flex flex-col md:flex-row gap-4 mb-6">

@@ -26,9 +26,18 @@ import {
   BarChartBig,
   CalendarRange,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export function SidebarNav() {
   const location = useLocation();
+  const { toast } = useToast();
+  
+  const handleUnimplementedFeature = (feature: string) => {
+    toast({
+      title: "Coming Soon",
+      description: `The ${feature} feature will be available in a future update.`
+    });
+  };
   
   return (
     <>

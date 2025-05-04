@@ -14,6 +14,10 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 import { DollarSign, Download, Filter, Plus } from "lucide-react";
 
 // Mock payment data
@@ -72,15 +76,122 @@ const payments = [
 
 export default function Payments() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [paymentDialog, setPaymentDialog] = useState(false);
+  const [paymentDetails, setPaymentDetails] = useState({
+    guest: "",
+    room: "",
+    amount: "",
+    method: "credit-card"
+  });
+  const { toast } = useToast();
+
+  const handlePaymentSubmit = () => {
+    if (!paymentDetails.guest || !paymentDetails.amount) {
+      toast({
+        variant: "destructive",
+        title: "Missing information",
+        description: "Please fill in all required fields"
+      });
+      return;
+    }
+
+    toast({
+      title: "Payment processed",
+      description: `Payment of $${paymentDetails.amount} has been processed successfully.`
+    });
+    
+    setPaymentDialog(false);
+    setPaymentDetails({
+      guest: "",
+      room: "",
+      amount: "",
+      method: "credit-card"
+    });
+  };
 
   return (
     <Layout>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Payments</h1>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          New Payment
-        </Button>
+        <Dialog open={paymentDialog} onOpenChange={setPaymentDialog}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              New Payment
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Process New Payment</DialogTitle>
+              <DialogDescription>
+                Enter the payment details below.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="guest" className="text-right">
+                  Guest
+                </Label>
+                <Input
+                  id="guest"
+                  className="col-span-3"
+                  value={paymentDetails.guest}
+                  onChange={(e) => setPaymentDetails({...paymentDetails, guest: e.target.value})}
+                  placeholder="Guest name"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="room" className="text-right">
+                  Room
+                </Label>
+                <Input
+                  id="room"
+                  className="col-span-3"
+                  value={paymentDetails.room}
+                  onChange={(e) => setPaymentDetails({...paymentDetails, room: e.target.value})}
+                  placeholder="Room number"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="amount" className="text-right">
+                  Amount
+                </Label>
+                <Input
+                  id="amount"
+                  className="col-span-3"
+                  value={paymentDetails.amount}
+                  onChange={(e) => setPaymentDetails({...paymentDetails, amount: e.target.value})}
+                  placeholder="0.00"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="method" className="text-right">
+                  Method
+                </Label>
+                <Select
+                  value={paymentDetails.method}
+                  onValueChange={(value) => setPaymentDetails({...paymentDetails, method: value})}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select payment method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="credit-card">Credit Card</SelectItem>
+                    <SelectItem value="cash">Cash</SelectItem>
+                    <SelectItem value="bank-transfer">Bank Transfer</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setPaymentDialog(false)}>Cancel</Button>
+              <Button onClick={handlePaymentSubmit}>Process Payment</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Card className="mb-6">
@@ -179,7 +290,10 @@ export default function Payments() {
                       </TableCell>
                       <TableCell className="font-mono text-sm">{payment.reference}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">View</Button>
+                        <Button variant="ghost" size="sm" onClick={() => toast({
+                          title: "Payment details",
+                          description: `Viewing details for payment ${payment.id}`
+                        })}>View</Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -224,7 +338,10 @@ export default function Payments() {
                         </TableCell>
                         <TableCell className="font-mono text-sm">{payment.reference}</TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm">View</Button>
+                          <Button variant="ghost" size="sm" onClick={() => toast({
+                            title: "Payment details",
+                            description: `Viewing details for payment ${payment.id}`
+                          })}>View</Button>
                         </TableCell>
                       </TableRow>
                   ))}
