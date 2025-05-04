@@ -1,10 +1,10 @@
-
 import { Layout } from "@/components/layout/Layout";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KeyRound, Search, UserPlus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock data for available rooms
 const availableRooms = [
@@ -126,6 +127,20 @@ const upcomingReservations = [
 export default function CheckIn() {
   const [searchReservation, setSearchReservation] = useState("");
   const [searchRoom, setSearchRoom] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState(() => {
+    // Check if we have a reservation ID in the URL params
+    const params = new URLSearchParams(location.search);
+    return params.get("reservation") ? "reservation" : "walkin";
+  });
+  const [selectedReservation, setSelectedReservation] = useState<string | null>(
+    () => {
+      const params = new URLSearchParams(location.search);
+      return params.get("reservation");
+    }
+  );
   
   // Filter rooms based on search
   const filteredRooms = availableRooms.filter(room =>
@@ -140,13 +155,34 @@ export default function CheckIn() {
     reservation.email.toLowerCase().includes(searchReservation.toLowerCase())
   );
   
+  const handleReservationCheckIn = (reservationId: string) => {
+    setSelectedReservation(reservationId);
+    setActiveTab("reservation");
+    
+    // Find the reservation details to pre-fill the form
+    const reservation = upcomingReservations.find(r => r.reservationId === reservationId);
+    if (reservation) {
+      toast({
+        title: "Reservation selected",
+        description: `Preparing check-in for ${reservation.guestName}`
+      });
+    }
+  };
+  
+  const handleCompleteCheckIn = () => {
+    toast({
+      title: "Check-in completed",
+      description: "Guest has been successfully checked in"
+    });
+  };
+  
   return (
     <Layout>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Check-In</h1>
       </div>
       
-      <Tabs defaultValue="walkin" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="walkin">Walk-In Check-In</TabsTrigger>
           <TabsTrigger value="reservation">Check-In Reservation</TabsTrigger>
@@ -360,7 +396,7 @@ export default function CheckIn() {
               </CardContent>
               <CardFooter className="flex justify-between border-t pt-6">
                 <Button variant="outline">Cancel</Button>
-                <Button>
+                <Button onClick={handleCompleteCheckIn}>
                   <KeyRound className="mr-2 h-4 w-4" />
                   Complete Check-In
                 </Button>
@@ -413,7 +449,10 @@ export default function CheckIn() {
                           </span>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button size="sm">
+                          <Button 
+                            size="sm"
+                            onClick={() => handleReservationCheckIn(reservation.reservationId)}
+                          >
                             <KeyRound className="mr-2 h-4 w-4" />
                             Check-In
                           </Button>
