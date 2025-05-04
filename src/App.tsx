@@ -19,6 +19,8 @@ import Employees from "./pages/Employees";
 import Companies from "./pages/Companies";
 import Maintenance from "./pages/Maintenance";
 import Reports from "./pages/Reports";
+import Login from "./pages/Login";
+import Reservations from "./pages/Reservations";
 
 // Setup pages
 import RoomTypes from "./pages/setup/RoomTypes";
@@ -35,9 +37,11 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/login" element={<Login />} />
           <Route path="/" element={<Index />} />
           <Route path="/rooms" element={<Rooms />} />
           <Route path="/guests" element={<Guests />} />
+          <Route path="/reservations" element={<Reservations />} />
           <Route path="/checkin" element={<CheckIn />} />
           <Route path="/checkout" element={<CheckOut />} />
           <Route path="/payments" element={<Payments />} />

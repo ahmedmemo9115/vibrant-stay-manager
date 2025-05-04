@@ -1,154 +1,189 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
 import {
-  Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger
-} from '@/components/ui/sidebar';
-import {
-  Bed,
-  Building2,
-  ChevronRight,
-  ClipboardList,
-  DollarSign,
-  FileText,
-  Home,
-  KeyRound,
-  LayoutDashboard,
+} from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Link, useLocation } from "react-router-dom";
+import { 
+  Home, 
+  HotelIcon, 
+  Users,
+  LogIn,
   LogOut,
-  Settings,
-  Users
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-
-interface NavItemProps {
-  icon: React.ElementType;
-  label: string;
-  to: string;
-  isActive?: boolean;
-  children?: { label: string; to: string }[];
-}
-
-const NavItem = ({ icon: Icon, label, to, isActive, children }: NavItemProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  
-  if (children) {
-    return (
-      <>
-        <SidebarMenuItem>
-          <Button 
-            variant="ghost" 
-            className={cn("w-full justify-between", isActive && "bg-sidebar-accent text-sidebar-accent-foreground")}
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            <span className="flex items-center gap-2">
-              <Icon size={18} />
-              <span>{label}</span>
-            </span>
-            <ChevronRight size={16} className={cn("transition-transform", isOpen && "rotate-90")} />
-          </Button>
-        </SidebarMenuItem>
-        
-        {isOpen && children.map((child, index) => (
-          <SidebarMenuItem key={index} className="pl-8">
-            <SidebarMenuButton asChild>
-              <Link to={child.to} className="text-sm">
-                {child.label}
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        ))}
-      </>
-    );
-  }
-  
-  return (
-    <SidebarMenuItem>
-      <SidebarMenuButton asChild className={cn(isActive && "bg-sidebar-accent text-sidebar-accent-foreground")}>
-        <Link to={to} className="flex items-center gap-2">
-          <Icon size={18} />
-          <span>{label}</span>
-        </Link>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
-  );
-};
+  CreditCard,
+  ReceiptText,
+  ClipboardCheck,
+  Building2,
+  Cog,
+  Wrench,
+  BarChartBig,
+  CalendarRange,
+} from "lucide-react";
 
 export function SidebarNav() {
+  const location = useLocation();
+  
   return (
     <>
-      <SidebarHeader className="p-4">
-        <Link to="/" className="flex items-center gap-2">
-          <Building2 className="h-6 w-6 text-hotel-500" />
-          <span className="font-bold text-lg text-white">Vibrant Stay</span>
-        </Link>
-      </SidebarHeader>
-      
-      <SidebarContent className="p-2">
+      <div className="py-4 px-6 border-b">
+        <h2 className="text-lg font-semibold">HMS</h2>
+        <p className="text-xs text-muted-foreground">Hotel Management System</p>
+      </div>
+      <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              <NavItem icon={LayoutDashboard} label="Dashboard" to="/" isActive={true} />
-              <NavItem icon={Bed} label="Rooms" to="/rooms" />
-              <NavItem icon={Users} label="Guests" to="/guests" />
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild active={location.pathname === "/"}>
+                  <Link to="/">
+                    <Home className="h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild active={location.pathname === "/rooms"}>
+                  <Link to="/rooms">
+                    <HotelIcon className="h-4 w-4" />
+                    <span>Rooms</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild active={location.pathname === "/reservations"}>
+                  <Link to="/reservations">
+                    <CalendarRange className="h-4 w-4" />
+                    <span>Reservations</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild active={location.pathname === "/guests"}>
+                  <Link to="/guests">
+                    <Users className="h-4 w-4" />
+                    <span>Guests</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild active={location.pathname === "/checkin"}>
+                  <Link to="/checkin">
+                    <LogIn className="h-4 w-4" />
+                    <span>Check In</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild active={location.pathname === "/checkout"}>
+                  <Link to="/checkout">
+                    <LogOut className="h-4 w-4" />
+                    <span>Check Out</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
         
         <SidebarGroup>
-          <SidebarGroupLabel>Front Desk</SidebarGroupLabel>
+          <SidebarGroupLabel>Management</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <NavItem icon={KeyRound} label="Check In" to="/checkin" />
-              <NavItem icon={ClipboardList} label="Check Out" to="/checkout" />
-              <NavItem icon={DollarSign} label="Payments" to="/payments" />
-              <NavItem icon={FileText} label="Charges" to="/charges" />
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild active={location.pathname === "/payments"}>
+                  <Link to="/payments">
+                    <CreditCard className="h-4 w-4" />
+                    <span>Payments</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild active={location.pathname === "/charges"}>
+                  <Link to="/charges">
+                    <ReceiptText className="h-4 w-4" />
+                    <span>Charges</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild active={location.pathname === "/housekeeping"}>
+                  <Link to="/housekeeping">
+                    <ClipboardCheck className="h-4 w-4" />
+                    <span>Housekeeping</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild active={location.pathname === "/employees"}>
+                  <Link to="/employees">
+                    <Users className="h-4 w-4" />
+                    <span>Employees</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild active={location.pathname === "/companies"}>
+                  <Link to="/companies">
+                    <Building2 className="h-4 w-4" />
+                    <span>Companies</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild active={location.pathname === "/maintenance"}>
+                  <Link to="/maintenance">
+                    <Wrench className="h-4 w-4" />
+                    <span>Maintenance</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild active={location.pathname === "/reports"}>
+                  <Link to="/reports">
+                    <BarChartBig className="h-4 w-4" />
+                    <span>Reports</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
         
         <SidebarGroup>
-          <SidebarGroupLabel>Administration</SidebarGroupLabel>
+          <SidebarGroupLabel>Configuration</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <NavItem 
-                icon={Settings} 
-                label="Setup" 
-                to="/setup"
-                children={[
-                  { label: 'Hotel Details', to: '/setup/hotel-details' },
-                  { label: 'Rooms & Floors', to: '/setup/rooms-floors' },
-                  { label: 'Room Types', to: '/setup/room-types' },
-                  { label: 'Employees', to: '/setup/employees' },
-                  { label: 'Users', to: '/setup/users' },
-                  { label: 'Permissions', to: '/setup/permissions' },
-                  { label: 'Currencies', to: '/setup/currencies' },
-                  { label: 'Services', to: '/setup/services' },
-                ]}
-              />
-              <NavItem icon={Users} label="Employees" to="/employees" />
-              <NavItem icon={Home} label="Housekeeping" to="/housekeeping" />
-              <NavItem icon={Settings} label="Maintenance" to="/maintenance" />
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild active={location.pathname.startsWith("/setup")}>
+                  <Link to="/setup">
+                    <Cog className="h-4 w-4" />
+                    <span>Setup</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      
-      <SidebarFooter className="p-4">
-        <Button variant="outline" size="sm" className="w-full">
-          <LogOut size={16} className="mr-2" />
-          Log Out
-        </Button>
+      <SidebarFooter>
+        <Link to="/login" className="w-full">
+          <div className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback className="bg-primary text-primary-foreground">JS</AvatarFallback>
+            </Avatar>
+            <div className="text-left">
+              <p className="text-sm font-medium">John Smith</p>
+              <p className="text-xs text-muted-foreground">Logout</p>
+            </div>
+          </div>
+        </Link>
       </SidebarFooter>
     </>
   );
