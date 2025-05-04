@@ -2,7 +2,8 @@
 import { StatusBadge } from "./StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { FileText } from "lucide-react";
+import { FileText, LogIn, Check } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface RoomCardProps {
   roomNumber: string;
@@ -23,6 +24,24 @@ export function RoomCard({
   checkOut,
   onViewDetails 
 }: RoomCardProps) {
+  const { toast } = useToast();
+  
+  const handleCheckIn = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toast({
+      title: "Check-in initiated",
+      description: `Starting check-in process for Room ${roomNumber}`
+    });
+  };
+  
+  const handleMakeReady = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toast({
+      title: "Room status updated",
+      description: `Room ${roomNumber} marked as ready`
+    });
+  };
+  
   return (
     <Card className="h-full flex flex-col overflow-hidden border-l-4 hover:shadow-md transition-all"
       style={{ borderLeftColor: getStatusColor(status) }}>
@@ -52,7 +71,25 @@ export function RoomCard({
           <p className="text-sm">{getStatusDescription(status)}</p>
         )}
       </CardContent>
-      <CardFooter className="pt-2 bg-gray-50">
+      <CardFooter className="pt-2 bg-gray-50 flex flex-col gap-2">
+        {/* Status-specific action buttons */}
+        <div className="flex gap-2 w-full">
+          {(status === "vacant") && (
+            <Button onClick={handleCheckIn} className="flex-1 bg-blue-500 hover:bg-blue-600" size="sm">
+              <LogIn className="mr-2 h-4 w-4" />
+              Check-in
+            </Button>
+          )}
+          
+          {(status === "cleaning" || status === "checkout" || status === "maintenance") && (
+            <Button onClick={handleMakeReady} className="flex-1 bg-green-500 hover:bg-green-600" size="sm">
+              <Check className="mr-2 h-4 w-4" />
+              Make Ready
+            </Button>
+          )}
+        </div>
+        
+        {/* View Details button always present */}
         <Button onClick={onViewDetails} variant="outline" className="w-full hover:bg-gray-100" size="sm">
           <FileText className="mr-2 h-4 w-4" />
           View Details
