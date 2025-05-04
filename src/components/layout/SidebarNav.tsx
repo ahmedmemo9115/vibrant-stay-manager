@@ -41,7 +41,7 @@ export function SidebarNav() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/"}>
                   <Link to="/">
                     <Home className="h-4 w-4" />
                     <span>Dashboard</span>
@@ -49,7 +49,7 @@ export function SidebarNav() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/rooms"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/rooms"}>
                   <Link to="/rooms">
                     <HotelIcon className="h-4 w-4" />
                     <span>Rooms</span>
@@ -57,7 +57,7 @@ export function SidebarNav() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/reservations"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/reservations"}>
                   <Link to="/reservations">
                     <CalendarRange className="h-4 w-4" />
                     <span>Reservations</span>
@@ -65,7 +65,7 @@ export function SidebarNav() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/guests"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/guests"}>
                   <Link to="/guests">
                     <Users className="h-4 w-4" />
                     <span>Guests</span>
@@ -73,7 +73,7 @@ export function SidebarNav() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/checkin"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/checkin"}>
                   <Link to="/checkin">
                     <LogIn className="h-4 w-4" />
                     <span>Check In</span>
@@ -81,7 +81,7 @@ export function SidebarNav() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/checkout"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/checkout"}>
                   <Link to="/checkout">
                     <LogOut className="h-4 w-4" />
                     <span>Check Out</span>
@@ -97,7 +97,7 @@ export function SidebarNav() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/payments"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/payments"}>
                   <Link to="/payments">
                     <CreditCard className="h-4 w-4" />
                     <span>Payments</span>
@@ -105,7 +105,7 @@ export function SidebarNav() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/charges"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/charges"}>
                   <Link to="/charges">
                     <ReceiptText className="h-4 w-4" />
                     <span>Charges</span>
@@ -113,7 +113,7 @@ export function SidebarNav() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/housekeeping"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/housekeeping"}>
                   <Link to="/housekeeping">
                     <ClipboardCheck className="h-4 w-4" />
                     <span>Housekeeping</span>
@@ -121,7 +121,7 @@ export function SidebarNav() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/employees"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/employees"}>
                   <Link to="/employees">
                     <Users className="h-4 w-4" />
                     <span>Employees</span>
@@ -129,7 +129,7 @@ export function SidebarNav() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/companies"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/companies"}>
                   <Link to="/companies">
                     <Building2 className="h-4 w-4" />
                     <span>Companies</span>
@@ -137,7 +137,7 @@ export function SidebarNav() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/maintenance"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/maintenance"}>
                   <Link to="/maintenance">
                     <Wrench className="h-4 w-4" />
                     <span>Maintenance</span>
@@ -145,7 +145,7 @@ export function SidebarNav() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/reports"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/reports"}>
                   <Link to="/reports">
                     <BarChartBig className="h-4 w-4" />
                     <span>Reports</span>
@@ -161,7 +161,7 @@ export function SidebarNav() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname.startsWith("/setup")}>
+                <SidebarMenuButton asChild isActive={location.pathname.startsWith("/setup")}>
                   <Link to="/setup">
                     <Cog className="h-4 w-4" />
                     <span>Setup</span>
