@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import Setup from "./pages/Setup";
 import HotelDetails from "./pages/HotelDetails";
 import Rooms from "./pages/Rooms";
+import RoomsCalendar from "./pages/RoomsCalendar";
 import Guests from "./pages/Guests";
 import CheckIn from "./pages/CheckIn";
 import CheckOut from "./pages/CheckOut";
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Index />} />
           <Route path="/rooms" element={<Rooms />} />
+          <Route path="/rooms-calendar" element={<RoomsCalendar />} />
           <Route path="/guests" element={<Guests />} />
           <Route path="/reservations" element={<Reservations />} />
           <Route path="/checkin" element={<CheckIn />} />

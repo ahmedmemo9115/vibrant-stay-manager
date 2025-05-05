@@ -1,4 +1,3 @@
-
 import {
   SidebarContent,
   SidebarFooter,
@@ -62,6 +61,14 @@ export function SidebarNav() {
                   <Link to="/rooms">
                     <HotelIcon className="h-4 w-4" />
                     <span>Rooms</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={location.pathname === "/rooms-calendar"}>
+                  <Link to="/rooms-calendar">
+                    <CalendarRange className="h-4 w-4" />
+                    <span>Rooms Calendar</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
