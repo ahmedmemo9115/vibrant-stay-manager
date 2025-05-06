@@ -101,6 +101,17 @@ const employees = [
     startDate: "Sep 15, 2023",
     status: "Active"
   }
+  ,
+  {
+    id: "E007",
+    name: "safasdhufhfsaik LODODIKDJH",
+    position: "dasss Auditor",
+    department: "Accounting",
+    email: "james@grandhotel.com",
+    phone: "555-606-6060",
+    startDate: "Sep 15, 2023",
+    status: "Active"
+  }
 ];
 
 // Sample schedules
